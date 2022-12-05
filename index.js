@@ -1,81 +1,134 @@
 const wrapper = document.querySelector(".wrapper"),
-inputpart = document.querySelector(".input-section"),
-infotext = inputpart.querySelector(".info-text"),
-inputField = inputpart.querySelector("input"),
+inputPart = document.querySelector(".input-part"),
+infoTxt = inputPart.querySelector(".info-txt"),
+inputField = inputPart.querySelector("input"),
+sbutton = inputPart.querySelector("button"),
 weatherPart = wrapper.querySelector(".weather-part"),
-wIcon = weatherPart.querySelector("img"),
-arrowBack = wrapper.querySelector(".header i")
+arrowBack = wrapper.querySelector("header i");
+
 let api;
 
-inputField.addEventListener("keyup",e =>{
-    if(e.key == "Enter"&& inputField.value != ""){
-        RequestApi(inputField.value)
+inputField.addEventListener("keyup", e =>{
+    // if user pressed enter btn and input value is not empty
+    if(e.key == "Enter" && inputField.value != ""){
+        requestApi(inputField.value);
     }
 });
-function RequestApi (city){
-    api = `https://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&appid=71859fd383ce6a6ea4e59cafa06f6a37`;
-featchDate();
-}
-function featchDate(){
-    infotext.innerText = 'Getting Weather details...'
-    infotext.classList.add("pending")
-    fetch(api).then(res => res.json()).then(result => weatherDetails(result)).catch(()=>{
-      infotext.innerText=  "something went wrong";
-      infotext.classList.replace("pending", "error")
-    })
-}
-
-function weatherDetails(info){
-console.log(info);
-if(info.cod == "404"){
-    infotext.classList.replace('pending','error')
-    console.log(`not entry `);
-    infotext.innerText=`${inputField.value} is't a valid city name`;
-
-}else{
-    console.log(info);
-    
-    const city =info.name;
-    const country =info.sys.country;
-    const {description, id}=info.weather[0];
-    const {temp, feels_like, humidity}=info.main;
-    
-  
-    if(id == 800){
-        wIcon.src = "icons/clear.svg";
-    }else if(id >= 200 && id <= 232){
-        wIcon.src = "icons/storm.svg";  
-    }else if(id >= 600 && id <= 622){
-        wIcon.src = "icons/snow.svg";
-    }else if(id >= 701 && id <= 781){
-        wIcon.src = "icons/haze.svg";
-    }else if(id >= 801 && id <= 804){
-        wIcon.src = "icons/cloud.svg";
-    }else if((id >= 500 && id <= 531) || (id >= 300 && id <= 321)){
-        wIcon.src = "icons/rain.svg";
+sbutton.addEventListener("click",()=>{
+    if(inputField.value != ""){
+        // console.log(inputField.value);
+        requestApi(inputField.value)
     }
-    
-    
+})
 
-weatherPart.querySelector(".temp .numb").innerText=Math.floor(temp);
+function requestApi(city){
+    infoTxt.innerText='Getting Weather details...'
+    infoTxt.classList.add("pending")
+    let api = fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&appid=71859fd383ce6a6ea4e59cafa06f6a37`)
 
-weatherPart.querySelector(".weather").innerText=description;
+api.then((value1)=>{
+    return value1.json();
+}).then((data)=>{
+    // console.log(data);
+    weatherDetails(data);
+}).catch(()=>{
+    infoTxt.innerText='Something went wrong...'
+    infoTxt.classList.replace("pending", "error")
+})
 
-weatherPart.querySelector(".location span").innerText =`${city}, ${country}`;
-console.log(wrapper);
-weatherPart.querySelector(".temp .num-2").innerText =Math.floor(feels_like);
-weatherPart.querySelector(".humidity span").innerText= `${humidity}%`;
-infotext.classList.remove("pending", "error");
-infotext.innerText ="";
-inputField.value = "";
-wrapper.classList.add("active");
-console.log(wrapper +'is the');
-console.log(wrapper);
-
-}
 }
 
 
-arrowBack.addEventListener("click", ()=>{
-    wrapper.classList.remove("active");
-});
+function weatherDetails(data){
+
+    if(data.cod == '404'){
+        infoTxt.classList.replace("pending", "error")
+        infoTxt.innerText=`${inputField.value} not a valid city name`
+
+    }else{
+      
+        const city =data.name;
+        console.log(data);
+        const country =data.sys.country;
+        const {description, id}=data.weather[0];
+        const {temp, feels_like, humidity}=data.main;
+       
+        let html =`<section class="weather-part">
+        <img src="" alt="Weather Icon">
+        <div class="temp">
+          <span class="numb">${Math.floor(temp)}</span>
+          <span class="deg">°</span>C
+        </div>
+        <div class="weather">${description}</div>
+        <div class="location">
+          <i class='bx bx-map'></i>
+          <span>${city}, ${country}</span>
+        </div>
+        <div class="bottom-details">
+          <div class="column feels">
+            <i class='bx bxs-thermometer'></i>
+            <div class="details">
+              <div class="temp">
+                <span class="numb-2">${Math.floor(feels_like)}</span>
+                <span class="deg">°</span>C
+              </div>
+              <p>Feels like</p>
+            </div>
+          </div>
+          <div class="column humidity">
+            <i class='bx bxs-droplet-half'></i>
+            <div class="details">
+              <span>${humidity}</span>
+              <p>Humidity</p>
+            </div>
+          </div>
+        </div>
+      </section>
+    `
+    document.querySelector(".weath").innerHTML = html;
+    infoTxt.classList.remove("pending", "error")
+    wrapper.classList.add("active")
+    console.log(html);
+    const weatherPart = document.querySelector(".weather-part"),
+      wIcon = weatherPart.querySelector("img");
+ console.log(wIcon);
+ if(id == 800){
+    wIcon.src = "icons/clear.svg";
+}else if(id >= 200 && id <= 232){
+    wIcon.src = "icons/storm.svg";  
+}else if(id >= 600 && id <= 622){
+    wIcon.src = "icons/snow.svg";
+}else if(id >= 701 && id <= 781){
+    wIcon.src = "icons/haze.svg";
+}else if(id >= 801 && id <= 804){
+    wIcon.src = "icons/cloud.svg";
+}else if((id >= 500 && id <= 531) || (id >= 300 && id <= 321)){
+    wIcon.src = "icons/rain.svg";
+}
+
+
+}
+
+wrapper.classList.add("active")
+
+
+      
+
+console.log(data.cod);
+arrowBack.addEventListener("click",  ()=>{
+    // if user pressed enter btn and input value is not empty
+    wrapper.classList.remove("active")
+    }
+)
+
+
+}
+
+
+
+
+
+
+
+
+
