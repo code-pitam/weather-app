@@ -18,8 +18,9 @@ body{
   background: #43AFFC;
 }
 .wrapper{
+  overflow: hidden;
   width: 400px;
-  height: 685px;
+  height: auto;
   margin-bottom: 50px;
   background: #fff;
   border-radius: 7px;
@@ -195,4 +196,7 @@ header i{
 }
 .humidity i{
   font-size: 37px;
+}
+.weath{
+  overflow: hidden;
 }
